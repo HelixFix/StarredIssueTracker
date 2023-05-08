@@ -29,7 +29,7 @@ def get_help_wanted_issues():
         repositories = [repo["full_name"] for repo in response.json()]
 
         # search for issues with specified labels in each repository
-        labels = 'help-wanted,contributions-welcome,good-first-issue,hacktoberfest,beginner-friendly,good-first-bug,easy,low-hanging-fruit,first-timers-only,bug'
+        labels = 'help-wanted,contributions-welcome,good-first-issue,hacktoberfest,beginner-friendly,good-first-bug,easy,low-hanging-fruit,first-timers-only,good first issue, help wanted'
         label_list = labels.split(',') # split string into list of labels
         issue_titles = []
         for repo_name in repositories:
