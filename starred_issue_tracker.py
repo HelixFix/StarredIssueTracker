@@ -33,19 +33,19 @@ def get_help_wanted_issues():
         label_list = labels.split(',') # split string into list of labels
         issue_titles = []
         for repo_name in repositories:
-            for label in label_list: # iterate over labels
-                response = requests.get(f'https://api.github.com/repos/{repo_name}/issues', 
-                                        headers=headers,
-                                        params={'state': 'open', 'labels': label})
-                issues = response.json()
-                if issues:
-                    print(f"Repository '{repo_name}' (https://github.com/{repo_name}) has {len([issue for issue in issues if not re.search(r'fixed|fixed_in_dev', ', '.join(label['name'] for label in issue['labels']))])} open issues labeled '{label}'")
-                    for issue in issues:
-                        issue_titles.append(issue['title'])
-                #else:
-                 #   print(f"Repository '{repo_name}' does not have any open issues labeled '{label}'")
-                    
-                 #   print(repo_name)
+            repo_info = requests.get(f'https://api.github.com/repos/{repo_name}', headers=headers).json()
+            if not repo_info.get('archived', False): # check if repository is not archived
+                for label in label_list:
+                    response = requests.get(f'https://api.github.com/repos/{repo_name}/issues', 
+                                            headers=headers,
+                                            params={'state': 'open', 'labels': label})
+                    issues = response.json()
+                    if issues:
+                        print(f"Repository '{repo_name}' (https://github.com/{repo_name}) has {len([issue for issue in issues if not re.search(r'fixed|fixed_in_dev', ', '.join(label['name'] for label in issue['labels']))])} open issues labeled '{label}'")
+                        for issue in issues:
+                            issue_titles.append(issue['title'])
+            else:
+                print(f"Skipping archived repository '{repo_name}'")
 
         return issue_titles
     
