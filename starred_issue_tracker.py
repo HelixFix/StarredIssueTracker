@@ -27,20 +27,24 @@ def get_help_wanted_issues():
         
         repositories = [repo["full_name"] for repo in response.json()]
 
-        # search for issues with the "help-wanted" label in each repository
+        # search for issues with specified labels in each repository
+        labels = 'help-wanted,contributions-welcome,good-first-issue,hacktoberfest,beginner-friendly,good-first-bug,easy,low-hanging-fruit,first-timers-only,bug'
+        label_list = labels.split(',') # split string into list of labels
         issue_titles = []
         for repo_name in repositories:
-        
-            response = requests.get(f'https://api.github.com/repos/{repo_name}/issues', 
-                                    headers=headers,
-                                    params={'state': 'open', 'labels': 'bug'})
-            issues = response.json()
-            if issues:
-                print(f"Repository '{repo_name}' has {len(issues)} open issues labeled 'bug'")
-            else:
-                print(f"Repository '{repo_name}' does not have any open issues labeled 'bug'")
-                
-                print(repo_name)
+            for label in label_list: # iterate over labels
+                response = requests.get(f'https://api.github.com/repos/{repo_name}/issues', 
+                                        headers=headers,
+                                        params={'state': 'open', 'labels': label})
+                issues = response.json()
+                if issues:
+                    print(f"Repository '{repo_name}' has {len(issues)} open issues labeled '{label}'")
+                    for issue in issues:
+                        issue_titles.append(issue['title'])
+                #else:
+                 #   print(f"Repository '{repo_name}' does not have any open issues labeled '{label}'")
+                    
+                 #   print(repo_name)
 
         return issue_titles
     
