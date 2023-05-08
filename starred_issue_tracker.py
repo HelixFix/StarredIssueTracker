@@ -1,3 +1,4 @@
+import re
 import requests
 from dotenv import load_dotenv
 import os
@@ -38,7 +39,7 @@ def get_help_wanted_issues():
                                         params={'state': 'open', 'labels': label})
                 issues = response.json()
                 if issues:
-                    print(f"Repository '{repo_name}' (https://github.com/{repo_name}) has {len(issues)} open issues labeled '{label}'")
+                    print(f"Repository '{repo_name}' (https://github.com/{repo_name}) has {len([issue for issue in issues if not re.search(r'fixed|fixed_in_dev', ', '.join(label['name'] for label in issue['labels']))])} open issues labeled '{label}'")
                     for issue in issues:
                         issue_titles.append(issue['title'])
                 #else:
