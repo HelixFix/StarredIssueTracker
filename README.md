@@ -6,7 +6,7 @@ This script retrieves and filters help-wanted issues from GitHub repositories th
 
 To use this script, you will need to set your GitHub username and personal access token as environment variables in a `.env` file in the same directory as the script. The `.env` file should contain the following lines:
 ```
-MYUSERNAME=yourgithubusername
+GITHUB_USERNAME=yourgithubusername
 TOKEN=yourpersonalaccesstoken
 ```
 You can then run the script by executing the following command in your terminal:
