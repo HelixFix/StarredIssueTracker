@@ -6,7 +6,7 @@ StarredIssueTracker est un outil open-source qui permet aux utilisateurs de rech
 
 1. Clonez ce dépôt sur votre machine locale.
 2. Installez les dépendances en exécutant `pip install -r requirements.txt`.
-3. Créez un fichier `.env` à la racine du projet et ajoutez vos informations d'identification GitHub en utilisant les noms de variable `USERNAME` et `TOKEN`.
+3. Créez un fichier `.env` à la racine du projet et ajoutez vos informations d'identification GitHub en utilisant les noms de variable `GITHUB_USERNAME` et `TOKEN`.
 4. Exécutez le script `main.py`.
 
 ## Utilisation
