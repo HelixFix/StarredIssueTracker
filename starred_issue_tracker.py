@@ -15,10 +15,10 @@ def get_help_wanted_issues():
     load_dotenv() # charger les variables depuis le fichier .env
 
     # récupérer les valeurs des variables
-    username = os.getenv("MY_USERNAME")
+    username = os.getenv("GITHUB_USERNAME")
     token    = os.getenv("TOKEN")
 
-    print("MY_USERNAME:", username)
+    print("GITHUB_USERNAME:", username)
     print("TOKEN:", token)
 
     # check that username is not None
@@ -66,7 +66,7 @@ def is_archived_repository(repo_name, token):
 
     Args:
         repo_name (str): The name of the repository to check.
-        token (str): The personal access token for the user's GitHub account.
+        token (str)    : The personal access token for the user's GitHub account.
 
     Returns:
         A boolean value indicating whether the repository is archived or not.
@@ -106,17 +106,27 @@ def get_open_issues(issues):
 
 def get_issues_with_labels(repositories, labels, token):
     """
-    Retrieves a list of issue titles for open issues with specified labels from the specified repositories.
+    Retrieves a list of open issues from the specified repositories that have the specified labels.
 
     Args:
-        repositories (list): A list of strings, where each string is the full name of a repository to search for issues in.
-        labels (str): A comma-separated string of labels to search for issues with.
-        token (str): The personal access token for the user's GitHub account.
+        repositories (list): A list of repository names to retrieve issues from.
+        labels (str)       : A comma-separated string of labels to filter issues by.
+        token (str)        : The personal access token for the user's GitHub account.
 
     Returns:
         A list of issue titles.
     """
-    issue_titles = [issue['title'] for repo_name in repositories if not is_archived_repository(repo_name, token) for label in labels.split(',') for issue in get_open_issues(get_issues_for_label(repo_name, label, token))]
+    issue_titles = []
+    for repo_name in repositories:
+        if not is_archived_repository(repo_name, token):
+            for label in labels.split(','):
+                issues = get_issues_for_label(repo_name, label, token)
+                if issues:
+                    print(f"Repository '{repo_name}' (https://github.com/{repo_name}) has {len(get_open_issues(issues))} open issues labeled '{label}'")
+                    for issue in get_open_issues(issues):
+                        issue_titles.append(issue['title'])
+        else:
+            print(f"Skipping archived repository '{repo_name}'")
     return issue_titles
 
 get_help_wanted_issues()
