@@ -11,8 +11,8 @@ token    = os.getenv("TOKEN")
 
 
 headers      = {"Authorization": f"token {token}"}
-LABELS       = 'good first issue,help wanted'
-label_list   = LABELS.split(',')
+labels       = 'good first issue,help wanted'
+label_list   = labels.split(',')
 issue_titles = []
 
 
@@ -57,14 +57,14 @@ def get_repositories(USERNAME, headers):
     return repositories
 
 
-def get_open_issues(repo_name, headers, LABELS):
+def get_open_issues(repo_name, headers, labels):
     """
     Retrieves a list of open issues for the specified repository and labels.
 
     Args:
         repo_name (str): The name of the repository in the format "USERNAME/repo_name".
         headers (dict) : A dictionary containing the authorization token for the GitHub API.
-        LABELS (list)  : A list of labels to filter the issues by.
+        labels (list)  : A list of labels to filter the issues by.
 
     Returns:
         A list of open issues for the specified repository and labels.
@@ -72,9 +72,9 @@ def get_open_issues(repo_name, headers, LABELS):
     issues = []
     repo_info = requests.get(f'https://api.github.com/repos/{repo_name}', headers=headers, timeout=10).json()
     if not repo_info.get('archived', False): # check if repository is not archived
-        for label in LABELS:
+        for label in labels:
             url      = f'https://api.github.com/repos/{repo_name}/issues'
-            params   = {'state': 'open', 'LABELS': label}
+            params   = {'state': 'open', 'labels': label}
             response = requests.get(url, headers=headers, params=params, timeout=10)
             if response.status_code == 200:
                 issues.extend(response.json())
