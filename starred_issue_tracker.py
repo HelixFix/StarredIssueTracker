@@ -1,110 +1,75 @@
-"""This module contains functions for retrieving and filtering help-wanted issues from GitHub."""
 import re
 import os
-import requests
 from dotenv import load_dotenv
-
-
-load_dotenv()
-USERNAME = os.getenv("MY_USERNAME")
-token    = os.getenv("TOKEN")
-
-
-headers      = {"Authorization": f"token {token}"}
-labels       = 'good first issue,help wanted'
-label_list   = labels.split(',')
-issue_titles = []
+import requests
 
 
 def get_help_wanted_issues():
-    """
-    Retrieves and filters help-wanted issues from GitHub.
+    load_dotenv() # charger les variables depuis le fichier .env
 
-    Returns:
-        A list of issue titles.
-    """
-    print("MY_USERNAME:", USERNAME)
+    # récupérer les valeurs des variables
+    username = os.getenv("MY_USERNAME")
+    token    = os.getenv("TOKEN")
+
+    print("MY_USERNAME:", username)
     print("TOKEN:", token)
 
-    if USERNAME is None:
-        raise ValueError("USERNAME not set in .env file")
+    # check that username is not None
+    if username is None:
+        raise ValueError("Username not set in .env file")
     
-    issue_titles.clear()
+    # retrieve a list of your starred repositories
+    repositories = get_starred_repositories(username, token)
 
-    for repo_name in get_repositories(USERNAME, headers):
-        open_issues     = get_open_issues(repo_name, headers, label_list)
-        if open_issues is not None:
-            relevant_issues = filter_relevant_issues(open_issues)
-            issues          = [issue['title'] for issue in relevant_issues]
-            issue_titles.extend(issues)
+    # search for issues with specified labels in each repository
+    labels = 'good first issue,help wanted'
+    issue_titles = get_issues_with_labels(repositories, labels, token)
 
-def get_repositories(USERNAME, headers):
-    """
-    Retrieves a list of repositories that the specified user has starred on GitHub.
+    return issue_titles
 
-    Args:
-        USERNAME (str): The GitHub USERNAME of the user whose starred repositories will be retrieved.
-        headers (dict): A dictionary containing the authorization token for the GitHub API.
+def get_starred_repositories(username, token):
+    url      = f"https://api.github.com/users/{username}/starred"
+    headers  = {"Authorization": f"token {token}"}
 
-    Returns:
-        A list of repository names in the format "USERNAME/repo_name".
-    """
+    try:
+        response = requests.get(url, headers=headers, timeout=10)
+        response.raise_for_status()
+        
+        repositories = [repo["full_name"] for repo in response.json()]
 
-    url = f"https://api.github.com/users/{USERNAME}/starred"
-    response = requests.get(url, headers=headers, timeout=10)
-    response.raise_for_status()
-    repositories = [repo["full_name"] for repo in response.json()]
-    return repositories
+        return repositories
+    
+    except requests.exceptions.RequestException as error:
+        print("Error retrieving repositories:", error)
+        return []
 
+def is_archived_repository(repo_name, token):
+    repo_info = requests.get(f'https://api.github.com/repos/{repo_name}', headers={"Authorization": f"token {token}"}, timeout=10).json()
+    return repo_info.get('archived', False)
 
-def get_open_issues(repo_name, headers, labels):
-    """
-    Retrieves a list of open issues for the specified repository and labels.
+def get_issues_for_label(repo_name, label, token):
+    response = requests.get(f'https://api.github.com/repos/{repo_name}/issues', 
+                            headers={"Authorization": f"token {token}"},
+                            params={'state': 'open', 'labels': label}, timeout=10)
+    issues = response.json()
+    return issues
 
-    Args:
-        repo_name (str): The name of the repository in the format "USERNAME/repo_name".
-        headers (dict) : A dictionary containing the authorization token for the GitHub API.
-        labels (list)  : A list of labels to filter the issues by.
+def get_open_issues(issues):
+    return [issue for issue in issues if not re.search(r'fixed|fixed_in_dev', ', '.join(label['name'] for label in issue['labels']))]
 
-    Returns:
-        A list of open issues for the specified repository and labels.
-    """
-    issues = []
-    repo_info = requests.get(f'https://api.github.com/repos/{repo_name}', headers=headers, timeout=10).json()
-    if not repo_info.get('archived', False): # check if repository is not archived
-        for label in labels:
-            url      = f'https://api.github.com/repos/{repo_name}/issues'
-            params   = {'state': 'open', 'labels': label}
-            response = requests.get(url, headers=headers, params=params, timeout=10)
-            if response.status_code == 200:
-                issues.extend(response.json())
+def get_issues_with_labels(repositories, labels, token):
+    issue_titles = []
+    for repo_name in repositories:
+        if not is_archived_repository(repo_name, token):
+            for label in labels.split(','):
+                issues = get_issues_for_label(repo_name, label, token)
                 if issues:
-                    print(f"Repository '{repo_name}' (https://github.com/{repo_name}) has {len([issue for issue in issues if not re.search(r'fixed|fixed_in_dev', ', '.join(label['name'] for label in issue['labels']))])} open issues labeled '{label}'")
-                    for issue in issues:
+                    print(f"Repository '{repo_name}' (https://github.com/{repo_name}) has {len(get_open_issues(issues))} open issues labeled '{label}'")
+                    for issue in get_open_issues(issues):
                         issue_titles.append(issue['title'])
-                #else:
-                # print(f"Skipping archived repository '{repo_name}'")
-        if issues:
-            return issues
-    return None
+        else:
+            print(f"Skipping archived repository '{repo_name}'")
 
-
-def filter_relevant_issues(issues):
-    """
-    Filters a list of issues to remove those that have the 'fixed' or 'fixed_in_dev' label.
-
-    Args:
-        issues (list): A list of issues to filter.
-
-    Returns:
-        A list of issues that do not have the 'fixed' or 'fixed_in_dev' label.
-    """
-    relevant_issues = []
-    for issue in issues:
-        labels = [label['name'] for label in issue['labels']]
-        if not any(label in labels for label in ['fixed', 'fixed_in_dev']):
-            relevant_issues.append(issue)
-    return relevant_issues
-
+    return issue_titles
 
 get_help_wanted_issues()
