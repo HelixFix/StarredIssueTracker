@@ -1,25 +1,32 @@
-# StarredIssueTracker
+# Starred Issue Tracker
 
-StarredIssueTracker est un outil open-source qui permet aux utilisateurs de rechercher facilement les issues ayant une étiquette particulière dans leurs dépôts étoilés sur GitHub. Grâce à cette application, les utilisateurs peuvent filtrer les issues en fonction de leurs étiquettes, puis afficher une liste des résultats correspondants pour leurs dépôts étoilés. Cette application est particulièrement utile pour les développeurs qui souhaitent trouver des problèmes ouverts dans les projets qu'ils suivent, afin de contribuer ou de mieux comprendre le code source.
+This script retrieves and filters help-wanted issues from GitHub repositories that a specified user has starred. 
 
-## Installation
+## Usage
 
-1. Clonez ce dépôt sur votre machine locale.
-2. Installez les dépendances en exécutant `pip install -r requirements.txt`.
-3. Créez un fichier `.env` à la racine du projet et ajoutez vos informations d'identification GitHub en utilisant les noms de variable `GITHUB_USERNAME` et `TOKEN`.
-4. Exécutez le script `main.py`.
+To use this script, you will need to set your GitHub username and personal access token as environment variables in a `.env` file in the same directory as the script. The `.env` file should contain the following lines:
+```
+MYUSERNAME=yourgithubusername
+TOKEN=yourpersonalaccesstoken
+```
+You can then run the script by executing the following command in your terminal:
+```
+python starred_issue_tracker.py
+```
 
-## Utilisation
+The script will retrieve and filter help-wanted issues from all of the repositories that you have starred on GitHub and print the titles of the relevant issues to the console.
 
-1. Au lancement, l'application vous demandera le nom de l'étiquette à rechercher.
-2. L'application récupérera ensuite les informations d'identification à partir du fichier `.env` et listera tous les dépôts étoilés associés au compte utilisateur.
-3. L'utilisateur doit sélectionner les dépôts qu'il souhaite analyser pour trouver les issues avec l'étiquette demandée.
-4. L'application affichera ensuite une liste des issues correspondantes pour chaque dépôt sélectionné.
+## Dependencies
 
-## Contributions
+This script requires the following dependencies:
 
-Les contributions sont les bienvenues ! Si vous trouvez un bug ou souhaitez ajouter une fonctionnalité, n'hésitez pas à ouvrir une issue ou une pull request.
+- requests
+- python-dotenv
 
-## Licence
+You can install these dependencies by running the following command in your terminal:
+```
+pip install -r requirements.txt
+```
+## License
 
-Ce projet est sous licence MIT. Voir le fichier LICENSE pour plus de détails.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
