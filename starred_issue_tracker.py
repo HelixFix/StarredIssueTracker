@@ -10,7 +10,7 @@ token    = os.getenv("TOKEN")
 
 
 headers      = {"Authorization": f"token {token}"}
-labels       = 'help-wanted,contributions-welcome,good-first-issue,hacktoberfest,beginner-friendly,good-first-bug,easy,low-hanging-fruit,first-timers-only,good first issue,help wanted'
+labels       = 'good first issue,help wanted'
 label_list   = labels.split(',')
 issue_titles = []
 
