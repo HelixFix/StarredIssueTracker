@@ -66,7 +66,7 @@ def is_archived_repository(repo_name, token):
 
     Args:
         repo_name (str): The name of the repository to check.
-        token (str): The personal access token for the user's GitHub account.
+        token (str)    : The personal access token for the user's GitHub account.
 
     Returns:
         A boolean value indicating whether the repository is archived or not.
@@ -110,8 +110,8 @@ def get_issues_with_labels(repositories, labels, token):
 
     Args:
         repositories (list): A list of repository names to retrieve issues from.
-        labels (str): A comma-separated string of labels to filter issues by.
-        token (str): The personal access token for the user's GitHub account.
+        labels (str)       : A comma-separated string of labels to filter issues by.
+        token (str)        : The personal access token for the user's GitHub account.
 
     Returns:
         A list of issue titles.
